@@ -1,0 +1,7 @@
+webservers:
+        hosts:
+                matomo2:
+                        ansible_host: XX.XX.XX.XX
+                        ansible_auth: agiskourle
+                        anisble_port: 22
+                        ansible_private_key_file: ~/.ssh/id_rsa

@@ -1,0 +1,25 @@
+version: "3"
+#https://www.digitalocean.com/community/tutorials/how-to-install-matomo-web-analytics-on-ubuntu-20-04
+services:
+  db:
+    image: mariadb
+    command: --max-allowed-packet=64MB
+    restart: always
+    environment:
+      - MARIADB_DATABASE=matomo
+      - MARIADB_USER
+      - MARIADB_PASSWORD
+      - MARIADB_ROOT_PASSWORD
+    volumes:
+      - ./db:/var/lib/mysql
+    #env_file:
+      #- ./db.env
+
+  app:
+    image: matomo
+    restart: always
+    volumes:
+      - ./matomo:/var/www/html
+      #- ./matomo.conf:/etc/apache2/sites-available/matomo.conf
+    ports:
+      - 80:80

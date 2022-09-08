@@ -1,0 +1,35 @@
+version: "3"
+
+services:
+  apache2:
+    image: httpd
+    restart: always
+    volumes:
+      - ./apache2_volume:/usr/local/apache2/htdocs
+      - ./index.html:/usr/local/apache2/htdocs/index.html
+    ports:
+      - 80:80
+   
+  influxdb:
+    image: influxdb
+    restart: always
+    ports:
+      - 8086:8086
+    volumes:
+      - ./influxdb-volume:/var/lib/influxdb
+    environment:
+      - INFLUXDB_DB=telegraf
+      - INFLUXDB_USER=telegraf
+      - INFLUXDB_USER_PASSWORD=password
+
+  telegraf:
+    image: telegraf
+    restart: always
+    volumes:
+      - ./telegraf.conf:/etc/telegraf/telegraf.conf
+
+  grafana:
+    image: grafana/grafana
+    restart: always
+    ports:
+      - 3000:3000

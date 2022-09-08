@@ -1,0 +1,105 @@
+---
+  - name: apache&tigPlaybook
+    hosts: server2
+    become: yes
+    become_user: root
+    tasks:
+      - name: Install apache2
+        apt: 
+          name: apache2 
+          update_cache: yes 
+          state: present
+
+      - name: Configure apache
+        copy:
+          src: index.html
+          dest: /var/www/html
+
+      - name: Restart apache
+        service:
+          name: apache2
+          state: restarted
+          enabled: yes
+
+      - name: Add influxDB Repo Key
+        apt_key: 
+          url: https://repos.influxdata.com/influxdb.key
+
+      - name: Add influxDB Repo
+        apt_repository: 
+          repo: deb https://repos.influxdata.com/ubuntu/ bionic stable 
+          state: present 
+          filename: influxdb 
+          
+      - name: Install influxDB
+        apt: 
+          name: influxdb 
+          state: present 
+          update_cache: yes
+      
+      - name: Start influxDB
+        service:
+          name: influxdb
+          state: started
+          enabled: yes
+
+      - name: Install python for influxDB
+        apt: 
+          name: python3-influxdb
+          state: present
+          update_cache: yes
+
+      - name: Create influxDB database for telegraf
+        influxdb_database:
+          hostname: localhost
+          database_name: telegraf
+
+      - name: Add user to influxDB
+        influxdb_user:
+          user_name: telegraf
+          user_password: password
+
+      - name: Install telegraf
+        apt: 
+          name: telegraf 
+          state: present 
+          update_cache: yes
+
+      - name: Start telegraf
+        service:
+          name: telegraf
+          state: started
+          enabled: yes
+
+      - name: Copy telegraf.conf file
+        copy:
+          src: telegraf.conf
+          dest: /etc/telegraf
+          remote_src: no
+
+      - name: Restart telegraf Service
+        service:
+          name: telegraf
+          state: restarted
+
+      - name: Add Grafana Repo Key
+        apt_key: 
+          url: https://packages.grafana.com/gpg.key
+
+      - name: Add Grafana Repo
+        apt_repository: 
+          repo: deb https://packages.grafana.com/oss/deb stable main
+          state: present
+          filename: grafana
+
+      - name: Install Grafana
+        apt: 
+          name: grafana 
+          state: present 
+          update_cache: yes
+
+      - name: Restart Grafana
+        service:
+          name: grafana-server
+          state: restarted
+          enabled: yes
