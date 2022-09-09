@@ -26,6 +26,8 @@ services:
     image: telegraf
     restart: always
     volumes:
+      - grafana-volume:/var/lib/grafana
+    volumes:
       - ./telegraf.conf:/etc/telegraf/telegraf.conf
 
   grafana:
